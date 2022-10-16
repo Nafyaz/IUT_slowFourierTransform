@@ -1,0 +1,79 @@
+{
+	// Place your snippets for cpp here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+
+	"Main Template": {
+		"prefix": "#ii",
+		"body": [
+			"#include<bits/stdc++.h>",
+			"using namespace std;",
+			"typedef pair<int, int> pii;",
+			"typedef long long LL;",
+			"typedef pair<LL, LL> pLL;",
+			"#define ff first",
+			"#define ss second",
+			"#define show(x) cout << #x << \": \" << x << \"; \"",
+			"#define INF 1000000000000015",
+			"#define MOD 1000000007",
+			"#define MAXN 2000006",
+			"",
+			"int main()",
+			"{",
+			"\tios_base::sync_with_stdio(0);",
+			"\tcin.tie(0);",
+			"",
+			"\t$0",
+			"}"
+		],
+		"description": "Use this for problems without test cases"
+	},
+
+	"Cases Template": {
+		"prefix": "#tt",
+		"body": [
+			"#include<bits/stdc++.h>",
+			"using namespace std;",
+			"typedef pair<int, int> pii;",
+			"typedef long long LL;",
+			"typedef pair<LL, LL> pLL;",
+			"#define ff first",
+			"#define ss second",
+			"#define show(x) cout << #x << \": \" << x << \"; \"",
+			"#define INF 1000000000000015",
+			"#define MOD 1000000007",
+			"#define MAXN 2000006",
+			"",
+			"void solve(int caseno)",
+			"{",
+			"\t$0",
+			"}",
+			"",
+			"int main()",
+			"{",
+			"\tios_base::sync_with_stdio(0);",
+			"\tcin.tie(0);",
+			"",
+			"\tint T = 1, caseno = 0;",
+			"",
+			"\tcin >> T;",
+			"",
+			"\twhile(T--)",
+			"\t{",
+			"\t\tsolve(++caseno);",
+			"\t}",
+			"}"
+		],
+		"description": "Use this for problems with test cases"
+	}
+}
