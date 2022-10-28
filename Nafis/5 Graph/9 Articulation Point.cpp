@@ -4,31 +4,31 @@ int tin[MAXN], low[MAXN], timer;
 vector<int> adj[MAXN];
 set<int> AP;
 
-void dfs(int v, int p = -1)
+void dfs(int node, int p = -1)
 {
-    vis[v] = 1;
+    vis[node] = 1;
     timer++;
-    tin[v] = low[v] = timer;
+    tin[node] = low[node] = timer;
 
     int child = 0;
-    for(auto to : adj[v])
+    for(auto nxt : adj[node])
     {
-        if(to == p)
+        if(nxt == p)
             continue;
-        if(!vis[to])
+        if(!vis[nxt])
         {
             child++;
-            dfs(to, v);
-            low[v] = min(low[v], low[to]);
-            if(low[to] >= tin[v] && p != -1)
-                AP.insert(v);
+            dfs(nxt, node);
+            low[node] = min(low[node], low[nxt]);
+            if(low[nxt] >= tin[node] && p != -1)
+                AP.insert(node);
         }
         else
-            low[v] = min(low[v], tin[to]);
+            low[node] = min(low[node], tin[nxt]);
     }
 
     if(p == -1 && child > 1)
-        AP.insert(v);
+        AP.insert(node);
 }
 
 void findAP()
