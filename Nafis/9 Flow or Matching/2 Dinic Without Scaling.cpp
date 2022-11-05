@@ -1,45 +1,110 @@
 // Complexity O(V^2E)
 
-template<class F> struct Dinic {
-	struct Edge { int to, rev; F cap; };
-	int N; V<V<Edge>> adj;
-	void init(int _N) { N = _N; adj.rsz(N); }
-	pi ae(int a, int b, F cap, F rcap = 0) { 
-		assert(min(cap,rcap) >= 0); // saved me > once
-		adj[a].pb({b,sz(adj[b]),cap});
-		adj[b].pb({a,sz(adj[a])-1,rcap});
-		return {a,sz(adj[a])-1};
-	}
-	F edgeFlow(pi loc) { // get flow along original edge
-		const Edge& e = adj.at(loc.f).at(loc.s);
-		return adj.at(e.to).at(e.rev).cap;
-	}
-	vi lev, ptr;
-	bool bfs(int s, int t) { // level=shortest dist from source
-		lev = ptr = vi(N);
-		lev[s] = 1; queue<int> q({s});
-		while (sz(q)) { int u = q.ft; q.pop();
-			each(e,adj[u]) if (e.cap && !lev[e.to]) {
-				q.push(e.to), lev[e.to] = lev[u]+1;
-				if (e.to == t) return 1;
-			}
-		}
-		return 0;
-	}
-	F dfs(int v, int t, F flo) {
-		if (v == t) return flo;
-		for (int& i = ptr[v]; i < sz(adj[v]); i++) {
-			Edge& e = adj[v][i];
-			if (lev[e.to]!=lev[v]+1||!e.cap) continue;
-			if (F df = dfs(e.to,t,min(flo,e.cap))) { 
-				e.cap -= df; adj[e.to][e.rev].cap += df;
-				return df; } // saturated >=1 one edge
-		}
-		return 0;
-	}
-	F maxFlow(int s, int t) {
-		F tot = 0; while (bfs(s,t)) while (F df = 
-			dfs(s,t,numeric_limits<F>::max())) tot += df;
-		return tot;
-	}
+struct edge
+{
+    LL node, nxt, cap, flow = 0;
+
+    edge(LL u, LL v, LL c) : node(u), nxt(v), cap(c) {}
+};
+
+struct Dinic
+{
+    vector<edge> edges;
+    vector<vector<LL>> adj;
+    vector<LL> level, ptr;
+
+    LL n, m, s, t;
+
+    Dinic(LL n, LL s, LL t) : n(n), s(s), t(t)
+    {
+        m = 0;
+        adj.resize(n+1);
+        level.resize(n+1);
+        ptr.resize(n+1);
+    }
+
+    void add_edges(LL u, LL v, LL c)
+    {
+        edges.push_back(edge(u, v, c));
+        adj[u].push_back(m);
+        m++;
+
+        edges.push_back(edge(v, u, c));
+        adj[v].push_back(m);
+        m++;
+    }
+
+    bool bfs(LL s)
+    {
+        queue<LL> q;
+
+        level[s] = 0;
+        q.push(s);
+
+        while(!q.empty())
+        {
+            LL node = q.front();
+            q.pop();
+
+            for(auto id : adj[node])
+            {
+                LL nxt = edges[id].nxt;
+                if(edges[id].cap == edges[id].flow || level[nxt] != -1)
+                    continue;
+
+                level[nxt] = level[node] + 1;
+                q.push(nxt);
+            }
+        }
+
+        return (level[t] != -1);
+    }
+
+    LL dfs(LL node, LL currFlow)
+    {
+        if(currFlow == 0)
+            return 0;
+
+        if(node == t)
+            return currFlow;
+
+        for(LL &cid = ptr[node]; cid < adj[node].size(); cid++)
+        {
+            LL id = adj[node][cid];
+            LL nxt = edges[id].nxt;
+
+            if(level[nxt] != level[node] + 1 || edges[id].cap == edges[id].flow)
+                continue;
+
+            LL newFlow = dfs(nxt, min(currFlow, edges[id].cap - edges[id].flow));
+
+            if(newFlow == 0)
+                continue;
+
+            edges[id].flow += newFlow;
+            edges[id ^ 1].flow -= newFlow;
+
+            return newFlow;
+        }
+
+        return 0;
+    }
+
+    LL getFlow()
+    {
+        LL flow = 0;
+
+        while(1)
+        {
+            fill(level.begin(), level.end(), -1);
+            if(!bfs(s))
+                break;
+
+            fill(ptr.begin(), ptr.end(), 0);
+            while(LL newFlow = dfs(s, INF))
+                flow += newFlow;
+        }
+
+        return flow;
+    }
 };
