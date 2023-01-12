@@ -1,26 +1,25 @@
-bool flag[MAXN];
+LL leastFactor[MAXN];
 vector<LL> primes;
 
 void sieve()
 {
     LL i, j;
 
-    flag[2] = 1;
-    for(i = 3; i < MAXN; i += 2)
-        flag[i] = 1;
+    for(i = 1; i < MAXN; i++)
+        leastFactor[i] = (i%2 == 0? 2 : i);
 
     for(i = 3; i*i < MAXN; i += 2)
     {
-        if(flag[i])
+        if(leastFactor[i] == i)
         {
             for(j = i*i; j < MAXN; j += 2*i)
-                flag[j] = 0;
+                leastFactor[j] = i;
         }
     }
 
     for(i = 2; i < MAXN; i++)
     {
-        if(flag[i])
+        if(leastFactor[i] == i)
             primes.push_back(i);
     }
 }
