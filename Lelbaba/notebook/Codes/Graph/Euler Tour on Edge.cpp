@@ -6,7 +6,7 @@ int t = 0;
 void dfs(graph &G, int node, int par) {
     out[node] = t; 
     for(int e: G[node]) {
-        int v = G(e).nxt(node);
+        int v = G(e).to(node);
         if(v == par) continue;
         fwd[e] = t++;
         dfs(G, v, node);
