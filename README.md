@@ -1,5 +1,5 @@
 ## Data Structure
-Merge Sort Tree
+Merge Sort Tree//
 Palindromic Tree
 DSU
 Binary Trie
