@@ -117,8 +117,196 @@ template<size_t N>
 bitset<N> rotl( std::bitset<N> const& bits, unsigned count ) {
     count %= N;  // Limit count to range [0,N)
     return bits << count | bits >> (N - count);
-}\end{lstlisting}
+}
+//O(n) RMQ(Max) for all k-length subarrays of a n-length array using deque
+deque<int>dq;
+int A[MAX];
+int n,k;
+
+void solve(){
+    for(int i=1;i<k;i++){
+        while(!dq.empty() && A[dq.back()]<=A[i]) dq.pop_back();
+        dq.push_back(i);
+    }
+    for(int i=k;i<=n;i++){
+        while(!dq.empty() && A[dq.back()]<=A[i]) dq.pop_back();
+        dq.push_back(i);
+        while(!dq.empty() && dq.front()<=i-k) dq.pop_front();
+        printf("%d ",A[dq.front()]);
+    }
+}
+\end{lstlisting}
 \section{DP}
+\subsection{1D-1D}
+\begin{lstlisting}
+///Author: anachor
+
+#include<bits/stdc++.h>
+using namespace std;
+
+///Solves dp[i] = min(dp[j] + cost(j+1, i)) given that cost() is QF
+long long solve1D(int n, long long cost(int, int)) {
+    vector<long long> dp(n+1), opt(n+1);
+    deque<pair<int, int>> dq;
+    dq.push_back({0, 1});
+    dp[0] = 0;
+
+    for (int i=1; i<=n; i++) {
+        opt[i] = dq.front().first;
+        dp[i] = dp[opt[i]] + cost(opt[i]+1, i);
+        if (i == n) break;
+
+        dq[0].second++;
+        if (dq.size() > 1 && dq[0].second == dq[1].second)  dq.pop_front();
+
+        int en = n;
+        while(dq.size()) {
+            int o = dq.back().first, st = dq.back().second;
+            if (dp[o]+cost(o+1, st) >= dp[i]+cost(i+1, st))  dq.pop_back();
+            else {
+                int lo = st, hi = en;
+                while (lo < hi) {
+                    int mid = (lo+hi+1)/2;
+                    if (dp[o]+cost(o+1, mid) < dp[i]+cost(i+1, mid) )   lo = mid;
+                    else                                                hi = mid-1;
+                }
+                if (lo < n) dq.push_back({i, lo+1});
+                break;
+            }
+            en = st-1;
+        }
+        if (dq.empty()) dq.push_back({i, i+1});
+    }
+    return dp[n];
+}
+
+///Solves https://open.kattis.com/problems/coveredwalkway
+const int N = 1e6+7;
+long long x[N];
+int c;
+long long cost(int l, int r) {
+    return (x[r] - x[l])*(x[r] - x[l]) + c;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    cin>>n>>c;
+    for (int i=1; i<=n; i++)    cin>>x[i];
+    cout<<solve1D(n, cost)<<endl;
+}
+\end{lstlisting}
+\subsection{ArrayPartitionDP}
+\begin{lstlisting}
+/**
+Solves dp[n][k] = min(dp[i-1][k-1] + cost(i, n)) using aliens trick
+Req: cost() is QF. Complexity: O(n log^2)
+
+Possible optimizations for O(n log n)
+You can change solve1D() with linear CHT if cost(l, r) is of the form f(l)*g(r)
+Alternatively, it may be possible to remove the binary search in 1D-1D.
+
+Author: anachor
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+typedef pair<LL, LL>  PLL;
+
+namespace ArrayPartitionDP {
+    ///define this function in code
+    LL base_cost(int l, int r);
+
+    long long C;
+    int n;
+
+    PLL operator+ (const PLL &a, const PLL &b) {
+        return PLL(a.first+b.first, a.second+b.second);
+    }
+
+    ///Solves dp[i] = min(dp[j] + cost(j+1, i)) given that cost() is QF
+    ///returns {dp[n], min no of partitions}
+    PLL solve1D() {
+        auto cost = [&](int l, int r){ return PLL(base_cost(l, r)+C, 1); };
+        vector<PLL> dp(n+1);
+        vector<int> opt(n+1);
+        deque<pair<int, int>> dq;
+        dq.push_back({0, 1});
+        dp[0] = {0, 0};
+
+        for (int i=1; i<=n; i++) {
+            opt[i] = dq.front().first;
+            dp[i] = dp[opt[i]] + cost(opt[i]+1, i);
+            if (i == n) break;
+
+            dq[0].second++;
+            if (dq.size() > 1 && dq[0].second == dq[1].second)  dq.pop_front();
+
+            int en = n;
+            while(dq.size()) {
+                int o = dq.back().first, st = dq.back().second;
+                if (dp[o]+cost(o+1, st) >= dp[i]+cost(i+1, st))  dq.pop_back();
+                else {
+                    int lo = st, hi = en;
+                    while (lo < hi) {
+                        int mid = (lo+hi+1)/2;
+                        if (dp[o]+cost(o+1, mid) < dp[i]+cost(i+1, mid) )   lo = mid;
+                        else                                                hi = mid-1;
+                    }
+                    if (lo < n) dq.push_back({i, lo+1});
+                    break;
+                }
+                en = st-1;
+            }
+            if (dq.empty()) dq.push_back({i, i+1});
+        }
+        return dp[n];
+    }
+
+    PLL check(long long c) {
+        C = c;
+        return solve1D();
+    }
+
+    long long solve(int N, int k, long long lo, long long hi) {
+        n = N;
+        while (lo < hi) {
+            long long mid = lo + (hi-lo)/2;
+            if (check(mid).second > k)  lo = mid+1;
+            else                        hi = mid;
+        }
+        return check(lo).first - 1LL*k*lo;
+    }
+}
+
+///Solves https://tioj.ck.tp.edu.tw/problems/1986
+const int N = 3e5+7;
+long long a[N], A[N];
+
+LL ArrayPartitionDP::base_cost(int l, int r) {
+    int m = (l+r)/2;
+    long long Z = (A[r] - A[m]) - (A[m] - A[l-1]) + (l%2 == r%2 ? a[m]: 0);
+    return Z;
+}
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    int n, k;
+
+    while (cin>>n>>k) {
+        for (int i=1; i<=n; i++)    cin>>a[i];
+        sort(a+1, a+n+1);
+        for (int i=1; i<=n; i++)    A[i] = A[i-1] + a[i];
+
+        cout<<ArrayPartitionDP::solve(n, k, 0, 1e12)<<endl;
+    }
+
+}
+\end{lstlisting}
 \subsection{Convex Hull Trick}
 \begin{lstlisting}
  struct line {
@@ -562,6 +750,26 @@ struct dominator {
     return tree;
   }
 };
+\end{lstlisting}
+\subsection{HashTable}
+\begin{lstlisting}
+#include <bits/stdc++.h.>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace std;
+using namespace __gnu_pbds;
+
+const int RANDOM = chrono::high_resolution_clock::now().time_since_epoch().count();
+unsigned hash_f(unsigned x) {
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return x;
+}
+
+unsigned hash_combine(unsigned a, unsigned b) { return a * 31 + b; }
+struct chash {int operator()(int x) const { return hash_f(x); }};
+typedef gp_hash_table<int, int, chash>gp;
+gp table;
 \end{lstlisting}
 \subsection{Implicit Segment Tree}
 \begin{lstlisting}
@@ -1028,7 +1236,6 @@ LL query(LL node, LL bg, LL ed, LL l, LL r, LL k)
     return query(leftNode, bg, mid, l, r, k) + query(rightNode, mid+1, ed, l, r, k);
 }
 \end{lstlisting}
-\subsection{Merge Sort Tree.cpp}
 \subsection{Persistent Segment Tree}
 \begin{lstlisting}
 struct Node 
@@ -1074,160 +1281,53 @@ Node* Update(Node* v, int bg, int ed, int pos, int new_val)
     else
         return new Node(v->l, Update(v->r, mid+1, ed, pos, new_val));
 }\end{lstlisting}
-\subsection{RMQ(1D)}
-\begin{lstlisting}
-/// Source: Folklore
-
-#include <bits/stdc++.h>
-using namespace std;
-const int N = 1e5 + 9, K = 18;
-int st[K][N], a[N], lg[N];
-
-void buildRMQ(int n) {
-    for (int i = 1; i <= n; i++) st[0][i] = a[i];
-
-    for (int k = 1; k < K; k++)
-        for (int i = 1; i + (1 << k) - 1 <= n; i++)
-            st[k][i] = min(st[k - 1][i], st[k - 1][i + (1 << (k - 1))]);
-
-    for (int i = 2; i <= n; i++) lg[i] = lg[i / 2] + 1;
-}
-
-int query(int i, int j) {
-    int k = lg[j - i + 1];
-    return min(st[k][i], st[k][j - (1 << k) + 1]);
-}
-\end{lstlisting}
-\subsection{Segment Tree}
-\begin{lstlisting}
-constexpr DT I = 0; 
-constexpr LT None = 0;
-DT val[4 * N];
-LT lazy[4 * N];
-int L, R;
-void pull(int s, int e, int node) {
-    val[node] = val[node << 1] + val[node << 1 | 1];
-}
-void apply(const LT &U, int s, int e, int node) {
-    val[node] += (e - s + 1) * U;
-    lazy[node] += U;
-}
-void reset(int node) {
-    lazy[node] = None;
-}
-DT merge(const DT &a, const DT &b) {
-    return a + b;
-}
-DT get(int s, int e, int node) {
-    return val[node];
-}
-void push(int s, int e, int node) {
-    if(s == e) return;
-    apply(lazy[node], s, s + e >> 1, node << 1);
-    apply(lazy[node], s + e + 2 >> 1, e, node << 1 | 1);
-    reset(node);
-}
-void update(int S,int E, LT uval, int s = L, int e = R, int node = 1) {
-    if(S > E) return;
-    if(S == s and E == e) {
-        apply(uval, s, e, node);
-        return;
-    }
-    push(s, e, node);
-    int m = s + e >> 1;
-    update(S, min(m, E), uval,  s,  m, node * 2);
-    update(max(S, m + 1), E, uval, m + 1, e, node * 2 + 1);
-    pull(s, e, node);
-}
-DT query(int S, int E, int s = L, int e = R, int node = 1) {
-    if(S > E) return I;
-    if(s == S and e == E) return get(s, e, node);
-    push(s, e, node);
-    int m = s + e >> 1;
-    DT L = query(S, min(m, E), s, m, node * 2);
-    DT R = query(max(S, m + 1), E, m + 1, e, node * 2 + 1);
-    return merge(L, R);
-}
-void init(int _L, int _R, vector <DT> &v) {
-    L = _L, R = _R;
-    build(L, R, v);
-}
-\end{lstlisting}
-\subsection{Segtree}
+\subsection{SparseTable (Rectangle Query)}
 \begin{lstlisting}
 #include <bits/stdc++.h>
-#define LL long long
 using namespace std;
 
-const int N = 1e5 + 7;
-int a[N];
-LL tr[4 * N];
-LL lz[4 * N];
+const int MAXN = 505;
+const int LOGN = 9;
 
-/// 1. Merge left and right
-LL combine(LL left, LL right) { return left + right; }
+//O(n^2 (logn)^2
+//Supports Rectangular Query
+int A[MAXN][MAXN];
+int M[MAXN][MAXN][LOGN][LOGN];
 
-/// 2. Push lazy down and merge lazy
-void propagate(int u, int st, int en) {
-    if (!lz[u]) return;
-    tr[u] += (en - st + 1) * lz[u];
-    if (st != en) {
-        lz[2 * u] += lz[u];
-        lz[2 * u + 1] += lz[u];
+void Build2DSparse(int N){
+    for(int i = 1; i <= N; i++){
+        for(int j = 1; j <= N; j++){
+            M[i][j][0][0] = A[i][j];
+        }
+        for(int q = 1; (1<<q) <= N; q++){
+            int add = 1<<(q-1);
+            for(int j=1; j+add <= N; j++){
+                M[i][j][0][q] = max(M[i][j][0][q-1], M[i][j+add][0][q-1]);
+            }
+        }
     }
-    lz[u] = 0;
-}
 
-void build(int u, int st, int en) {
-    if (st == en) {
-        tr[u] = a[st];  /// 3. Initialize
-        lz[u] = 0;
-    } else {
-        int mid = (st + en) / 2;
-        build(2 * u, st, mid);
-        build(2 * u + 1, mid + 1, en);
-        tr[u] = combine(tr[2 * u], tr[2 * u + 1]);
-        lz[u] = 0;  /// 3. Initialize
-    }
-}
-
-void update(int u, int st, int en, int l, int r, int x) {
-    propagate(u, st, en);
-    if (r < st || en < l)
-        return;
-    else if (l <= st && en <= r) {
-        lz[u] += x;  /// 4. Merge lazy
-        propagate(u, st, en);
-    } else {
-        int mid = (st + en) / 2;
-        update(2 * u, st, mid, l, r, x);
-        update(2 * u + 1, mid + 1, en, l, r, x);
-        tr[u] = combine(tr[2 * u], tr[2 * u + 1]);
+    for(int p=1; (1<<p)<=N; p++){
+        int add = 1<<(p-1);
+        for(int i=1; i+add <= N; i++){
+            for(int q=0; (1<<q) <= N; q++){
+                for(int j=1; j<= N; j++){
+                    M[i][j][p][q] = max(M[i][j][p-1][q], M[i+add][j][p-1][q]);
+                }
+            }
+        }
     }
 }
 
-LL query(int u, int st, int en, int l, int r) {
-    propagate(u, st, en);
-    if (r < st || en < l)
-        return 0;  /// 5. Proper null value
-    else if (l <= st && en <= r)
-        return tr[u];
-    else {
-        int mid = (st + en) / 2;
-        return combine(query(2 * u, st, mid, l, r),
-                       query(2 * u + 1, mid + 1, en, l, r));
-    }
-}
+//returns max of all A[i][j], where x1<=i<=x2 and y1<=j<=y2
+int Query(int x1,int y1,int x2,int y2){
+    int kX = log2(x2-x1+1); int kY = log2(y2-y1+1);
+    int addX = 1<<kX;       int addY = 1<<kY;
 
-void debug(int u, int st, int en) {
-    cout << "--->" << u << " " << st << " " << en << " " << tr[u] << " "
-         << lz[u] << endl;
-    if (st == en) return;
-    int mid = (st + en) / 2;
-    debug(2 * u, st, mid);
-    debug(2 * u + 1, mid + 1, en);
+    int ret1 = max(M[x1][y1][kX][kY], M[x1][y2-addY+1][kX][kY]);
+    int ret2 = max(M[x2-addX+1][y1][kX][kY], M[x2-addX+1][y2-addY+1][kX][kY]);
+    return max(ret1, ret2);
 }
-
 \end{lstlisting}
 \subsection{Treap}
 \begin{lstlisting}
@@ -1520,6 +1620,56 @@ int circleCircleTangencyPoints(Circle c1, Circle c2, vector<Point> &a, vector<Po
     }
     return cnt;
 }\end{lstlisting}
+\subsection{Closest Pair}
+\begin{lstlisting}
+// Tested : UVa 10245 - The Closest Pair Problem
+
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long int
+
+struct Point{
+    ll x, y;
+    Point() {}
+    Point(ll _x, ll _y) {x = _x; y = _y;}
+    bool operator < (const Point &p) const {return x == p.x ? y < p.y : x < p.x;}
+    Point operator - (Point p) {return Point(x - p.x, y - p.y);}
+};
+ll getDot(Point a,Point b)  {return a.x * b.x + a.y * b.y;}
+ll dist(Point p, Point q)   {return getDot(p-q, p-q);}
+
+vector<Point> p;
+ll solve(int l, int r) {
+    if(r - l <= 3) {
+        ll ret = LLONG_MAX;
+        for(int i = l; i <= r; i++)
+            for(int j = i + 1; j <= r; j++)
+                ret = min(ret, dist(p[i], p[j]));
+        return ret;
+    }
+
+    int mid = (l + r) / 2;
+    ll d = min(solve(l, mid), solve(mid+1, r));
+
+    vector<Point> t;
+    for(int i = l; i <= r; i++){
+        ll dx = p[mid].x - p[i].x;
+        if(dx * dx <= d) t.push_back({p[i].y, p[i].x});
+    }
+
+    sort(t.begin(), t.end());
+    for(int i = 0; i < t.size(); i++) {
+        for(int j = i+1; j < t.size() && j <= i + 15; j++)
+            d = min(d, dist(t[i], t[j]));
+    }
+    return d;
+}
+
+ll closestPair() {
+    sort(p.begin(), p.end());
+    return solve(0, p.size()-1);
+}
+\end{lstlisting}
 \subsection{Convex}
 \begin{lstlisting}
 ///minkowski sum of two polygons in O(n)
@@ -2474,6 +2624,14 @@ public:
 };\end{lstlisting}
 \subsection{Dinic Max Flow}
 \begin{lstlisting}
+///flow with demand(lower bound) only for DAG
+//create new src and sink
+//add_edge(new src, u, sum(in_demand[u]))
+//add_edge(u, new sink, sum(out_demand[u]))
+//add_edge(old sink, old src, inf)
+// if (sum of lower bound == flow) then demand satisfied
+//flow in every edge i = demand[i] + e.flow
+
 using Ti = long long;
 const Ti INF = 1LL << 60;
 struct edge {
@@ -3396,6 +3554,27 @@ vector<LL> anyMod(const vector<LL> &a, const vector<LL> &b) {
     }
     return ans;
 }\end{lstlisting}
+\subsection{Fast Fibonacci}
+\begin{lstlisting}
+// F(n-1) * F(n+1) - F(n) * F(n) = (-1)^n
+// F(n+k) = F(k) * F(n+1) + F(k-1) * F(n)
+// gcd(F(m), F(n)) = F(gcd(m,n))
+
+#define ll long long int
+
+pair<ll, ll> fib(ll n) {
+    if(n == 0) return {0, 1};
+    ll x, y;
+    if(n & 1) {
+        tie(y, x) = fib(n - 1);
+        return {x, (y + x) % MOD};
+    }
+    else{
+        tie(x, y) = fib(n >> 1);
+        return {(x * y + x * (y - x + MOD)) % MOD, (x * x + y * y) % MOD};
+    }
+}
+\end{lstlisting}
 \subsection{Fractional Binary Search}
 \begin{lstlisting}
 /**
@@ -3471,40 +3650,102 @@ double gaussian_elimination(int row, int col) {
             return 0;
     return det;
 }\end{lstlisting}
-\subsection{Green Hackenbush on Trie}
+\subsection{Green Hackenbush}
 \begin{lstlisting}
-int trie[40 * MAX][26];
-int XOR[40 * MAX][26];
-int valu[40 * MAX];
-int node = 1;
+// Green Hackenbush
+// Description:
+//   Consider a two player game on a graph with a specified vertex (root).
+//   In each turn, a player eliminates one edge.
+//   Then, if a subgraph that is disconnected from the root, it is removed.
+//   If a player cannot select an edge (i.e., the graph is singleton),
+//   he will lose.
+//
+//   Compute the Grundy number of the given graph.
+//
+// Algorithm:
+//   We use two principles:
+//     1. Colon Principle: Grundy number of a tree is the xor of
+//        Grundy number of child subtrees.
+//        (Proof: easy).
+//
+//     2. Fusion Principle: Consider a pair of adjacent vertices u, v
+//        that has another path (i.e., they are in a cycle). Then,
+//        we can contract u and v without changing Grundy number.
+//        (Proof: difficult)
+//
+//   We first decompose graph into two-edge connected components.
+//   Then, by contracting each components by using Fusion Principle,
+//   we obtain a tree (and many self loops) that has the same Grundy
+//   number to the original graph. By using Colon Principle, we can
+//   compute the Grundy number.
+//
+// Complexity:
+//   O(m + n).
+//
+// Verified:
+//   SPOJ 1477: Play with a Tree
+//   IPSC 2003 G: Got Root?
 
-int add(string s) {
-  int now = 1;
-  stack<int>st;
-  for (int i = 0; i < s.size(); i++) {
-    int c = s[i] - 'a';
-    if (!trie[now][c]) trie[now][c] = ++node;
-    st.push(now);
-    now = trie[now][c];
-  }
+#define fst first
+#define snd second
+#define all(c) ((c).begin()), ((c).end())
+struct hackenbush {
+	int n;
+	vector<vector<int>> adj;
+	hackenbush(int n) : n(n), adj(n) { }
+	void add_edge(int u, int v) {
+		adj[u].push_back(v);
+		if (u != v) adj[v].push_back(u);
+	}
+	// r is the only root connecting to the ground
+	int grundy(int r) {
+		vector<int> num(n), low(n);
+		int t = 0;
+		function<int(int, int)> dfs = [&](int p, int u) {
+			num[u] = low[u] = ++t;
+			int ans = 0;
+			for (int v : adj[u]) {
+				if (v == p) { p += 2 * n; continue; }
+				if (num[v] == 0) {
+					int res = dfs(u, v);
+					low[u] = min(low[u], low[v]);
+					if (low[v] > num[u]) ans ^= (1 + res) ^ 1; // bridge
+					else                 ans ^= res;           // non bridge
+				} else low[u] = min(low[u], num[v]);
+			}
+			if (p > n) p -= 2 * n;
+			for (int v : adj[u])
+				if (v != p && num[u] <= num[v]) ans ^= 1;
+			return ans;
+		};
+		return dfs(-1, r);
+	}
+};
 
-  int nxt = now;
-  int nxt_val = 0;
-  for (int i = 0; i < 26; i++) nxt_val ^= XOR[now][i];
-  while (!st.empty()) {
-    now = st.top();
-    st.pop();
-    int val = 0;
-    for (int i = 0; i < 26; i++) {
-      if (trie[now][i] == nxt) {
-        XOR[now][i] = nxt_val + 1;
-      }
-      val ^= XOR[now][i];
-    }
-    nxt_val = val;
-    nxt = now;
-  }
-  return nxt_val;
+int main() {
+	int cases; scanf("%d", &cases);
+	for (int icase = 0; icase < cases; ++icase) {
+		int n; scanf("%d", &n);
+		vector<int> ground(n);
+		int r;
+		for (int i = 0; i < n; ++i) {
+			scanf("%d", &ground[i]);
+			if (ground[i] == 1) r = i;
+		}
+		int ans = 0;
+		hackenbush g(n);
+		for (int i = 0; i < n - 1; ++i) {
+			int u, v;
+			scanf("%d %d", &u, &v);
+			--u; --v;
+			if (ground[u]) u = r;
+			if (ground[v]) v = r;
+			if (u == v) ans ^= 1;
+			else g.add_edge(u, v);
+		}
+		int res = ans ^ g.grundy(r);
+		printf("%d\n", res != 0);
+	}
 }
 \end{lstlisting}
 \subsection{Lagrange}
@@ -3893,6 +4134,47 @@ long long Lehmer(long long n) {
     }
     return res;
 }
+\end{lstlisting}
+\subsection{Red-Blue Hackenbush}
+\begin{lstlisting}
+//Resources : http://www.geometer.org/mathcircles/hackenbush.pdf
+
+Lets say you are given a rooted tree and edges are coloured red and blue.
+Red player will cut red edges and blue player will cut blue edges.
+When a edge is cut, then the subtree under it is cut. Who will win?
+
+It can be solved by red-blue hacken bush.
+
+If the tree is a chain, then it's simple. 
+Let cur = 1, and from root there are consecutive x blue/red edges.
+Then we add cur x times to our grundy val if the first edges are blue,
+otherwise minus cur x times if the first edges are red. And for every next edges
+we make cur = cur / 2 and add it to our grundy value depending on the edge colour.
+
+For a tree follow this pseudo-code:
+
+dfs(u):
+    if(u == LEAF_NODE) return 0
+    else:
+        double grundy = 0
+        
+        for(all child v of u)
+            double x = dfs(v)
+            if(edge(u,v) is blue):
+                y = smallest integer > 0 so that (x + y) > 1
+                x = x + y
+                y = 2 ^ (y - 1)
+                grundy = grundy + (x / y) //Double Divison
+            else:
+                y = smallest integer > 0 so that (x - y) < -1
+                x = x - y
+                y = 2 ^ (y - 1)
+                grundy = grundy + (x / y) //Double Divison
+    return grundy
+
+If the grundy is positive, then blue wins
+if it's negetive red wins
+If it's 0, then the player who first moves lose.
 \end{lstlisting}
 \subsection{Shanks' Baby Step, Giant Step}
 \begin{lstlisting}

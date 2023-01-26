@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.12.20)  26 JAN 2023 20:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.12.20)  27 JAN 2023 03:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -537,7 +537,12 @@ Package geometry Warning: The marginal notes overrun the paper.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-(./out.toc)
+(./out.toc
+Underfull \hbox (badness 10000) in paragraph at lines 25--25
+ [][] [][]\OT1/cmr/m/n/10 SparseTable (Rect-an-gle 
+ []
+
+)
 \tf@toc=\write4
 \openout4 = `out.toc'.
 
@@ -561,6 +566,15 @@ LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line
 (/usr/share/texmf-dist/tex/latex/base/ts1cmtt.fd
 File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 ))
+Overfull \hbox (86.87576pt too wide) in paragraph at lines 171--172
+[][] 
+ []
+
+
+Overfull \hbox (102.17587pt too wide) in paragraph at lines 257--258
+[][] 
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.0pt, for example:
@@ -767,7 +781,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.0pt}.
 
-[23] (./Extra/math.tex
+[23]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.0pt}.
+
+[24] (./Extra/math.tex
 
 Package amsmath Warning: Foreign command \atopwithdelims;
 (amsmath)                \frac or \genfrac should be used instead
@@ -805,18 +828,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.0pt}.
 
-[24]) (./out.aux)
+[25]) (./out.aux)
 Package rerunfilecheck Info: File `out.out' has not changed.
-(rerunfilecheck)             Checksum: FF623EE894FEEDDA86D1105787C75D66;11115.
+(rerunfilecheck)             Checksum: D81EEB0EF9B498B5E40F01C17FD1308D;11545.
  ) 
 Here is how much of TeX's memory you used:
- 19231 strings out of 478238
- 289758 string characters out of 5850455
- 2115442 words of memory out of 5000000
- 32692 multiletter control sequences out of 15000+600000
+ 19619 strings out of 478238
+ 295218 string characters out of 5850455
+ 2190470 words of memory out of 5000000
+ 32801 multiletter control sequences out of 15000+600000
  471390 words of font info for 36 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,12n,63p,575b,2389s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 60i,12n,63p,575b,2406s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fon
 ts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/publi
@@ -830,10 +853,10 @@ usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/ty
 pe1/public/amsfonts/cm/cmtt8.pfb></usr/share/texmf-dist/fonts/type1/public/cm-s
 uper/sftt0800.pfb>
-Output written on out.pdf (25 pages, 385772 bytes).
+Output written on out.pdf (26 pages, 400384 bytes).
 PDF statistics:
- 6111 PDF objects out of 6186 (max. 8388607)
- 5996 compressed objects within 60 object streams
- 4619 named destinations out of 5155 (max. 500000)
- 697 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6466 PDF objects out of 7423 (max. 8388607)
+ 6346 compressed objects within 64 object streams
+ 4898 named destinations out of 5155 (max. 500000)
+ 721 words of extra memory for PDF output out of 10000 (max. 10000000)
 

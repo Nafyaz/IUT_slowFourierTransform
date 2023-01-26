@@ -1,0 +1,91 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}All Macros}{1}{section.1}%
+\contentsline {section}{\numberline {2}DP}{1}{section.2}%
+\contentsline {subsection}{\numberline {2.1}1D-1D}{1}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}ArrayPartitionDP}{1}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Convex Hull Trick}{2}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Divide and Conquer dp}{2}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Knuth optimization}{2}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Li Chao Tree}{2}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Triangulation DP}{3}{subsection.2.7}%
+\contentsline {section}{\numberline {3}Data Structure}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}BIT-2D}{3}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}BIT}{3}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Binary Trie}{3}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}DSU With Rollbacks}{3}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}DSU on Tree}{3}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Dominator Tree}{3}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}HashTable}{4}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Implicit Segment Tree}{4}{subsection.3.8}%
+\contentsline {subsection}{\numberline {3.9}Implicit Treap}{4}{subsection.3.9}%
+\contentsline {subsection}{\numberline {3.10}Link Cut Tree}{5}{subsection.3.10}%
+\contentsline {subsection}{\numberline {3.11}MO with Update}{5}{subsection.3.11}%
+\contentsline {subsection}{\numberline {3.12}Merge Sort Tree}{6}{subsection.3.12}%
+\contentsline {subsection}{\numberline {3.13}Persistent Segment Tree}{6}{subsection.3.13}%
+\contentsline {subsection}{\numberline {3.14}SparseTable (Rectangle Query)}{6}{subsection.3.14}%
+\contentsline {subsection}{\numberline {3.15}Treap}{6}{subsection.3.15}%
+\contentsline {section}{\numberline {4}Geometry}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Circular}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Closest Pair}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Convex}{8}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Enclosing Circle}{9}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Half Planar}{10}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Intersecting Segments}{10}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}Linear}{10}{subsection.4.7}%
+\contentsline {subsection}{\numberline {4.8}Point Rotation Trick}{11}{subsection.4.8}%
+\contentsline {subsection}{\numberline {4.9}Point}{11}{subsection.4.9}%
+\contentsline {subsection}{\numberline {4.10}Polygon}{12}{subsection.4.10}%
+\contentsline {section}{\numberline {5}Graph}{12}{section.5}%
+\contentsline {subsection}{\numberline {5.1}00}{12}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Block Cut Tree}{12}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Bridge Tree}{13}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Centroid Decomposition}{13}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Dinic Max Flow}{13}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Euler Tour on Edge}{14}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}HLD}{14}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}Hungarian}{14}{subsection.5.8}%
+\contentsline {subsection}{\numberline {5.9}LCA In O(1)}{14}{subsection.5.9}%
+\contentsline {subsection}{\numberline {5.10}Min Cost Max Flow}{15}{subsection.5.10}%
+\contentsline {subsection}{\numberline {5.11}SCC}{15}{subsection.5.11}%
+\contentsline {subsection}{\numberline {5.12}StoerWanger}{15}{subsection.5.12}%
+\contentsline {subsection}{\numberline {5.13}Tree Algo}{16}{subsection.5.13}%
+\contentsline {subsection}{\numberline {5.14}Tree Isomorphism}{16}{subsection.5.14}%
+\contentsline {section}{\numberline {6}Math}{16}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Adaptive Simpsons}{16}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Berlekamp Massey}{17}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Chinese Remainder Theorem}{17}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Combi}{17}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}FFT}{17}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Fast Fibonacci}{18}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7}Fractional Binary Search}{18}{subsection.6.7}%
+\contentsline {subsection}{\numberline {6.8}Gaussian Elimination}{18}{subsection.6.8}%
+\contentsline {subsection}{\numberline {6.9}Green Hackenbush}{18}{subsection.6.9}%
+\contentsline {subsection}{\numberline {6.10}Lagrange}{19}{subsection.6.10}%
+\contentsline {subsection}{\numberline {6.11}Linear Sieve}{19}{subsection.6.11}%
+\contentsline {subsection}{\numberline {6.12}Matrix Exponentiation}{19}{subsection.6.12}%
+\contentsline {subsection}{\numberline {6.13}Mobius Function}{19}{subsection.6.13}%
+\contentsline {subsection}{\numberline {6.14}NTT}{19}{subsection.6.14}%
+\contentsline {subsection}{\numberline {6.15}Pollard Rho}{20}{subsection.6.15}%
+\contentsline {subsection}{\numberline {6.16}Prime Counting Function}{20}{subsection.6.16}%
+\contentsline {subsection}{\numberline {6.17}Red-Blue Hackenbush}{20}{subsection.6.17}%
+\contentsline {subsection}{\numberline {6.18}Shanks' Baby Step, Giant Step}{21}{subsection.6.18}%
+\contentsline {subsection}{\numberline {6.19}Stirling Numbers}{21}{subsection.6.19}%
+\contentsline {subsection}{\numberline {6.20}Subset Convolution}{21}{subsection.6.20}%
+\contentsline {subsection}{\numberline {6.21}WalshHadamard}{21}{subsection.6.21}%
+\contentsline {subsection}{\numberline {6.22}Xor Basis}{22}{subsection.6.22}%
+\contentsline {section}{\numberline {7}String}{22}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Aho Corasick}{22}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Double hash}{22}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Manacher's}{23}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Palindromic Tree}{23}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}String Match FFT}{23}{subsection.7.5}%
+\contentsline {subsection}{\numberline {7.6}Suffix Array}{23}{subsection.7.6}%
+\contentsline {subsection}{\numberline {7.7}Suffix Automata}{24}{subsection.7.7}%
+\contentsline {subsection}{\numberline {7.8}Z Algo}{24}{subsection.7.8}%
+\contentsline {section}{\numberline {8}Equations and Formulas}{25}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Catalan Numbers}{25}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Stirling Numbers First Kind}{25}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Stirling Numbers Second Kind}{25}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Other Combinatorial Identities}{25}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}Different Math Formulas}{25}{subsection.8.5}%
+\contentsline {subsection}{\numberline {8.6}GCD and LCM}{25}{subsection.8.6}%
