@@ -73,6 +73,6 @@
 
 ## Formula
 - [x] Derangement
-- [ ] Picks theorem
+- [x] Picks theorem
 
 
