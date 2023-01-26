@@ -16,7 +16,7 @@
 - [x] Hungarian
 - [x] Dominator Tree
 - [x] Bridge Tree
-- [ ] Block cut Tree
+- [x] Block cut Tree
 - [x] Edge Euler Tour
 - [x] HLD
 - [x] MCMF
@@ -28,19 +28,19 @@
 
 ## Dp optimization
 - [x] SOS
-- [ ] CHT
+- [x] CHT
 - [x] Divide and conquer
 - [x] knuth
 - [x] Li chao tree
 
 ## Math
 - [x] Mobius Function
-- [ ] Matrix Expo
+- [x] Matrix Expo
 - [x] FFT 
 - [x] NTT
 - [x] FFT anymod
 - [x] Walsh hadamart
-- [ ] gaussian elimination
+- [x] gaussian elimination
 - [x] Combi
 - [x] CRT + egcd
 - [x] Linear Sieve
@@ -51,6 +51,9 @@
 - [x] Barlekamp Massey
 - [x] Adaptive Simpsions
 - [x] Fractional Binary saerch
+
+## Geometry
+- [x] Everything from Anachor
 
 ## String
 - [x] Manchers
@@ -63,13 +66,13 @@
 
 
 ## Misc
-- [ ] Order Set 
-- [ ] All headers
-- [ ] debug template
+- [x] Order Set 
+- [x] All headers
+- [x] debug template
 
 
 ## Formula
-- [ ] Derangement
+- [x] Derangement
 - [ ] Picks theorem
 
 
