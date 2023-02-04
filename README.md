@@ -7,7 +7,7 @@
 - [x] 2D BIT
 - [x] Segtree
 - [x] Persistent Segtree
-
+- [ ] Basic Segtree
 
 ## Algo
 - [x] Mo's + with update algorithm
