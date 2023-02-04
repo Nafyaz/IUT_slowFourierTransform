@@ -76,5 +76,6 @@
 - [x] Picks theorem
 
 
-## Tools
+## Tools /Builids
 - [ ] Stresstester script
+- [ ] .vimrc
