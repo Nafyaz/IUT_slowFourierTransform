@@ -7,7 +7,7 @@
 - [x] 2D BIT
 - [x] Segtree
 - [x] Persistent Segtree
-
+- [ ] Basic Segtree
 
 ## Algo
 - [x] Mo's + with update algorithm
@@ -76,3 +76,6 @@
 - [x] Picks theorem
 
 
+## Tools /Builids
+- [ ] Stresstester script
+- [ ] .vimrc
