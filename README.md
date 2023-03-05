@@ -7,14 +7,15 @@
 - [x] 2D BIT
 - [x] Segtree
 - [x] Persistent Segtree
-- [ ] Basic Segtree
+- [x] Implicit Segtree
 
-## Algo
+## Offline Querying
 - [x] Mo's + with update algorithm
+- [x] Divide and Conquer LIFO
 
 ## Graph
-- [x] Hungarian
-- [x] Dominator Tree
+- [ ] Hungarian : Flow diye kora jabe
+- [ ] Dominator Tree : Very Obscure, never used
 - [x] Bridge Tree
 - [x] Block cut Tree
 - [x] Edge Euler Tour
@@ -24,7 +25,7 @@
 - [x] Centroid Decomposition
 - [x] LCA // LCA O(1)
 - [x] SCC
-- [x] 2Sat
+- [ ] 2Sat : Can write on my own if needed, obscure
 
 ## Dp optimization
 - [x] SOS
@@ -35,12 +36,12 @@
 
 ## Math
 - [x] Mobius Function
-- [x] Matrix Expo
+- [ ] Matrix Expo : Can write if needed
 - [x] FFT 
 - [x] NTT
 - [x] FFT anymod
 - [x] Walsh hadamart
-- [x] gaussian elimination
+- [ ] gaussian elimination : obscure, not needed generally, can write if emergency
 - [x] Combi
 - [x] CRT + egcd
 - [x] Linear Sieve
@@ -53,7 +54,7 @@
 - [x] Fractional Binary saerch
 
 ## Geometry
-- [x] Everything from Anachor
+- [x] Everything from Anachor: half plane, intersecting segments, covering circles baad
 
 ## String
 - [x] Manchers
@@ -68,7 +69,7 @@
 ## Misc
 - [x] Order Set 
 - [x] All headers
-- [x] debug template
+- [x] debug template : updated
 
 
 ## Formula
@@ -78,4 +79,4 @@
 
 ## Tools /Builids
 - [ ] Stresstester script
-- [ ] .vimrc
+- [x] .vimrc
