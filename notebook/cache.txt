@@ -1,5 +1,5 @@
-IUT slowFourierTransformation
+IUT slowFourierTransform
 Islamic University of Technology
 3
-portrait
-11
+landscape
+10
