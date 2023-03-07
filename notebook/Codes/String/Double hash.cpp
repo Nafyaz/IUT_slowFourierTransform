@@ -20,7 +20,6 @@ void hash_init(int n) {
   P[0] = PLL(1, 1);
   for (int i = 1; i <= n; i++) P[i] = (P[i - 1] * base) % mod;
 }
-/// appends c to string
 PLL append(PLL cur, char c) { return (cur * base + c) % mod; }
 /// prepends c to string with size k
 PLL prepend(PLL cur, int k, char c) { return (P[k] * c + cur) % mod; }
@@ -61,7 +60,6 @@ struct hashlist {
     for (int i = 1; i <= len; i++) H[i] = append(H[i - 1], s[i - 1]);
     for (int i = len; i >= 1; i--) R[i] = append(R[i + 1], s[i - 1]);
   }
-
   /// 1-indexed
   PLL range_hash(int l, int r) {
     return ((H[r] - H[l - 1] * P[r - l + 1]) % mod + mod) % mod;

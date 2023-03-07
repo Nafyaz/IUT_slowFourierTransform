@@ -1,10 +1,3 @@
-/** Suffix Array Construction: O(NlogN)
-    LCP Array Construction: O(NlogN)
-    Suffix LCP: O(logN)  **/
-typedef pair<int, int> PII;
-typedef vector<int> VI;
-
-/// Equivalence Class INFO
 vector<VI> c;
 VI sort_cyclic_shifts(const string &s) {
   int n = s.size();
@@ -29,14 +22,12 @@ VI sort_cyclic_shifts(const string &s) {
 
   VI pn(n), cn(n);
   cnt.resize(n);
-
   for (int h = 0; (1 << h) < n; h++) {
     for (int i = 0; i < n; i++) {
       pn[i] = p[i] - (1 << h);
       if (pn[i] < 0) pn[i] += n;
     }
     fill(cnt.begin(), cnt.end(), 0);
-
     /// radix sort
     for (int i = 0; i < n; i++) cnt[c[h][pn[i]]]++;
     for (int i = 1; i < classes; i++) cnt[i] += cnt[i - 1];
@@ -55,14 +46,12 @@ VI sort_cyclic_shifts(const string &s) {
   }
   return p;
 }
-
 VI suffix_array_construction(string s) {
   s += "!";
   VI sorted_shifts = sort_cyclic_shifts(s);
   sorted_shifts.erase(sorted_shifts.begin());
   return sorted_shifts;
 }
-
 /// LCP between the ith and jth (i != j) suffix of the STRING
 int suffixLCP(int i, int j) {
   assert(i != j);
@@ -86,45 +75,14 @@ VI lcp_construction(const string &s, const VI &sa) {
 
   for (int i = 0; i < n; i++) rank[sa[i]] = i;
 
-  for (int i = 0, k = 0; i < n; i++) {
+  for (int i = 0, k = 0; i < n; i++, k -= (k != 0)) {
     if (rank[i] == n - 1) {
       k = 0;
       continue;
     }
-
     int j = sa[rank[i] + 1];
     while (i + k < n && j + k < n && s[i + k] == s[j + k]) k++;
     lcp[rank[i]] = k;
-    if (k) k--;
   }
   return lcp;
 }
-
-const int MX = 1e6 + 7, K = 20;
-int lg[MX];
-
-void pre() {
-  lg[1] = 0;
-  for (int i = 2; i < MX; i++) lg[i] = lg[i / 2] + 1;
-}
-
-struct RMQ {
-  int N;
-  VI v[K];
-  RMQ(const VI &a) {
-    N = a.size();
-    v[0] = a;
-
-    for (int k = 0; (1 << (k + 1)) <= N; k++) {
-      v[k + 1].resize(N);
-      for (int i = 0; i - 1 + (1 << (k + 1)) < N; i++) {
-        v[k + 1][i] = min(v[k][i], v[k][i + (1 << k)]);
-      }
-    }
-  }
-
-  int findMin(int i, int j) {
-    int k = lg[j - i + 1];
-    return min(v[k][i], v[k][j + 1 - (1 << k)]);
-  }
-};

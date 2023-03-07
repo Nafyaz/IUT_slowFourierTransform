@@ -6,7 +6,6 @@ for (int i = 0, l = 0, r = -1; i < n; i++) {
   d1[i] = k--;
   if (i + k > r) l = i - k, r = i + k;
 }
-
 vector<int> d2(n);
 // d[i] = number of palindromes taking s[i-1] and s[i] as center
 for (int i = 0, l = 0, r = -1; i < n; i++) {
