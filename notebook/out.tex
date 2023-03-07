@@ -87,7 +87,7 @@ template <typename DT>
 using ordered_set = tree <DT, null_type, less<DT>, rb_tree_tag,tree_order_statistics_node_update>;
 
 /*--- DEBUG TEMPLATE STARTS HERE ---*/
-#ifdef LEL
+#ifdef SFT
 void show(int x) {cerr << x;}
 void show(long long x) {cerr << x;}
 void show(double x) {cerr << x;}
@@ -342,270 +342,6 @@ struct LiChao {
 };
 \end{lstlisting}
 \section{Data Structure}
-\subsection{BIT-2D}
-\begin{lstlisting}
-const int N = 1008;
-int bit[N][N], n, m;
-int a[N][N], q;
-void update(int x, int y, int val) {
-  for (; x < N; x += -x & x)
-    for (int j = y; j < N; j += -j & j) bit[x][j] += val;
-}
-int get(int x, int y) {
-  int ans = 0;
-  for (; x; x -= x & -x)
-    for (int j = y; j; j -= j & -j) ans += bit[x][j];
-  return ans;
-}
-int get(int x1, int y1, int x2, int y2) {
-  return get(x2, y2) - get(x1 - 1, y2) - get(x2, y1 - 1) + get(x1 - 1, y1 - 1);
-}
-\end{lstlisting}
-\subsection{Divide And Conquer Query Offline}
-\begin{lstlisting}
-namespace up {
-int l[N], r[N], u[N], v[N], tm;
-void push(int _l, int _r, int _u, int _v) {
-  l[tm] = _l, r[tm] = _r, u[tm] = _u, v[tm] = _v;
-  tm++;
-}
-}  // namespace up
-namespace que {
-int node[N], tm;
-LL ans[N];
-void push(int _node) { node[++tm] = _node; }
-}  // namespace que
-namespace edge_set {
-void push(int i) { dsu ::merge(up ::u[i], up ::v[i]); }
-void pop(int t) { dsu ::rollback(t); }
-int time() { return dsu ::op.size(); }
-LL query(int u) { return a[dsu ::root(u)]; }
-}  // namespace edge_set
-namespace dncq {
-vector<int> tree[4 * N];
-void update(int idx, int l = 0, int r = que ::tm, int node = 1) {
-  int ul = up ::l[idx], ur = up ::r[idx];
-  if (r < ul or ur < l) return;
-  if (ul <= l and r <= ur) {
-    tree[node].push_back(idx);
-    return;
-  }
-  int m = l + r >> 1;
-  update(idx, l, m, node << 1);
-  update(idx, m + 1, r, node << 1 | 1);
-}
-void dfs(int l = 0, int r = que ::tm, int node = 1) {
-  int cur = edge_set ::time();
-  for (int e : tree[node]) edge_set ::push(e);
-  if (l == r) {
-    que ::ans[l] = edge_set ::query(que ::node[l]);
-  } else {
-    int m = l + r >> 1;
-    dfs(l, m, node << 1);
-    dfs(m + 1, r, node << 1 | 1);
-  }
-  edge_set ::pop(cur);
-}
-}  // namespace dncq
-void push_updates() {
-  for (int i = 0; i < up ::tm; i++) dncq ::update(i);
-}
-\end{lstlisting}
-\subsection{MO with Update}
-\begin{lstlisting}
-const int N = 1e5 + 5, sz = 2700, bs = 25;
-int arr[N], freq[2 * N], cnt[2 * N], id[N], ans[N];
-struct query {
-  int l, r, t, L, R;
-  query(int l = 1, int r = 0, int t = 1, int id = -1)
-      : l(l), r(r), t(t), L(l / sz), R(r / sz) {}
-  bool operator<(const query &rhs) const {
-    return (L < rhs.L) or (L == rhs.L and R < rhs.R) or
-           (L == rhs.L and R == rhs.R and t < rhs.t);
-  }
-} Q[N];
-struct update {
-  int idx, val, last;
-} Up[N];
-int qi = 0, ui = 0;
-int l = 1, r = 0, t = 0;
-
-void add(int idx) {
-  --cnt[freq[arr[idx]]];
-  freq[arr[idx]]++;
-  cnt[freq[arr[idx]]]++;
-}
-void remove(int idx) {
-  --cnt[freq[arr[idx]]];
-  freq[arr[idx]]--;
-  cnt[freq[arr[idx]]]++;
-}
-void apply(int t) {
-  const bool f = l <= Up[t].idx and Up[t].idx <= r;
-  if (f) remove(Up[t].idx);
-  arr[Up[t].idx] = Up[t].val;
-  if (f) add(Up[t].idx);
-}
-void undo(int t) {
-  const bool f = l <= Up[t].idx and Up[t].idx <= r;
-  if (f) remove(Up[t].idx);
-  arr[Up[t].idx] = Up[t].last;
-  if (f) add(Up[t].idx);
-}
-int mex() {
-  for (int i = 1; i <= N; i++)
-    if (!cnt[i]) return i;
-  assert(0);
-}
-int main() {
-  int n, q;
-  cin >> n >> q;
-  int counter = 0;
-  map<int, int> M;
-  for (int i = 1; i <= n; i++) {
-    cin >> arr[i];
-    if (!M[arr[i]]) M[arr[i]] = ++counter;
-    arr[i] = M[arr[i]];
-  }
-  iota(id, id + N, 0);
-  while (q--) {
-    int tp, x, y;
-    cin >> tp >> x >> y;
-    if (tp == 1)
-      Q[++qi] = query(x, y, ui);
-    else {
-      if (!M[y]) M[y] = ++counter;
-      y = M[y];
-      Up[++ui] = {x, y, arr[x]};
-      arr[x] = y;
-    }
-  }
-  t = ui;
-  cnt[0] = 3 * n;
-  sort(id + 1, id + qi + 1, [&](int x, int y) { return Q[x] < Q[y]; });
-  for (int i = 1; i <= qi; i++) {
-    int x = id[i];
-    while (Q[x].t > t) apply(++t);
-    while (Q[x].t < t) undo(t--);
-    while (Q[x].l < l) add(--l);
-    while (Q[x].r > r) add(++r);
-    while (Q[x].l > l) remove(l++);
-    while (Q[x].r < r) remove(r--);
-    ans[x] = mex();
-  }
-  for (int i = 1; i <= qi; i++) cout << ans[i] << '\n';
-}
-\end{lstlisting}
-\subsection{Merge Sort Tree}
-\begin{lstlisting}
-vector<LL> Tree[4 * MAXN];
-LL arr[MAXN];
-
-vector<LL> merge(vector<LL> v1, vector<LL> v2) {
-  LL i = 0, j = 0;
-  vector<LL> ret;
-
-  while (i < v1.size() || j < v2.size()) {
-    if (i == v1.size()) {
-      ret.push_back(v2[j]);
-      j++;
-    } else if (j == v2.size()) {
-      ret.push_back(v1[i]);
-      i++;
-    } else {
-      if (v1[i] < v2[j]) {
-        ret.push_back(v1[i]);
-        i++;
-      } else {
-        ret.push_back(v2[j]);
-        j++;
-      }
-    }
-  }
-
-  return ret;
-}
-
-void Build(LL node, LL bg, LL ed) {
-  if (bg == ed) {
-    Tree[node].push_back(arr[bg]);
-    return;
-  }
-
-  LL leftNode = 2 * node, rightNode = 2 * node + 1;
-  LL mid = (bg + ed) / 2;
-
-  Build(leftNode, bg, mid);
-  Build(rightNode, mid + 1, ed);
-
-  Tree[node] = merge(Tree[leftNode], Tree[rightNode]);
-}
-
-LL query(LL node, LL bg, LL ed, LL l, LL r, LL k) {
-  if (ed < l || bg > r) return 0;
-
-  if (l <= bg && ed <= r)
-    return upper_bound(Tree[node].begin(), Tree[node].end(), k) -
-           Tree[node].begin();
-
-  LL leftNode = 2 * node, rightNode = 2 * node + 1;
-  LL mid = (bg + ed) / 2;
-
-  return query(leftNode, bg, mid, l, r, k) +
-         query(rightNode, mid + 1, ed, l, r, k);
-}
-\end{lstlisting}
-\subsection{SparseTable (Rectangle Query)}
-\begin{lstlisting}
-#include <bits/stdc++.h>
-using namespace std;
-
-const int MAXN = 505;
-const int LOGN = 9;
-
-// O(n^2 (logn)^2
-// Supports Rectangular Query
-int A[MAXN][MAXN];
-int M[MAXN][MAXN][LOGN][LOGN];
-
-void Build2DSparse(int N) {
-  for (int i = 1; i <= N; i++) {
-    for (int j = 1; j <= N; j++) {
-      M[i][j][0][0] = A[i][j];
-    }
-    for (int q = 1; (1 << q) <= N; q++) {
-      int add = 1 << (q - 1);
-      for (int j = 1; j + add <= N; j++) {
-        M[i][j][0][q] = max(M[i][j][0][q - 1], M[i][j + add][0][q - 1]);
-      }
-    }
-  }
-
-  for (int p = 1; (1 << p) <= N; p++) {
-    int add = 1 << (p - 1);
-    for (int i = 1; i + add <= N; i++) {
-      for (int q = 0; (1 << q) <= N; q++) {
-        for (int j = 1; j <= N; j++) {
-          M[i][j][p][q] = max(M[i][j][p - 1][q], M[i + add][j][p - 1][q]);
-        }
-      }
-    }
-  }
-}
-
-// returns max of all A[i][j], where x1<=i<=x2 and y1<=j<=y2
-int Query(int x1, int y1, int x2, int y2) {
-  int kX = log2(x2 - x1 + 1);
-  int kY = log2(y2 - y1 + 1);
-  int addX = 1 << kX;
-  int addY = 1 << kY;
-
-  int ret1 = max(M[x1][y1][kX][kY], M[x1][y2 - addY + 1][kX][kY]);
-  int ret2 = max(M[x2 - addX + 1][y1][kX][kY],
-                 M[x2 - addX + 1][y2 - addY + 1][kX][kY]);
-  return max(ret1, ret2);
-}
-\end{lstlisting}
 \subsection{Segment Tree}
 \begin{lstlisting}
 const int N = 1000006;
@@ -842,6 +578,270 @@ void clear() {
   tc++;
   ptr = 0;
   root->update();
+}
+\end{lstlisting}
+\subsection{BIT-2D}
+\begin{lstlisting}
+const int N = 1008;
+int bit[N][N], n, m;
+int a[N][N], q;
+void update(int x, int y, int val) {
+  for (; x < N; x += -x & x)
+    for (int j = y; j < N; j += -j & j) bit[x][j] += val;
+}
+int get(int x, int y) {
+  int ans = 0;
+  for (; x; x -= x & -x)
+    for (int j = y; j; j -= j & -j) ans += bit[x][j];
+  return ans;
+}
+int get(int x1, int y1, int x2, int y2) {
+  return get(x2, y2) - get(x1 - 1, y2) - get(x2, y1 - 1) + get(x1 - 1, y1 - 1);
+}
+\end{lstlisting}
+\subsection{Divide And Conquer Query Offline}
+\begin{lstlisting}
+namespace up {
+int l[N], r[N], u[N], v[N], tm;
+void push(int _l, int _r, int _u, int _v) {
+  l[tm] = _l, r[tm] = _r, u[tm] = _u, v[tm] = _v;
+  tm++;
+}
+}  // namespace up
+namespace que {
+int node[N], tm;
+LL ans[N];
+void push(int _node) { node[++tm] = _node; }
+}  // namespace que
+namespace edge_set {
+void push(int i) { dsu ::merge(up ::u[i], up ::v[i]); }
+void pop(int t) { dsu ::rollback(t); }
+int time() { return dsu ::op.size(); }
+LL query(int u) { return a[dsu ::root(u)]; }
+}  // namespace edge_set
+namespace dncq {
+vector<int> tree[4 * N];
+void update(int idx, int l = 0, int r = que ::tm, int node = 1) {
+  int ul = up ::l[idx], ur = up ::r[idx];
+  if (r < ul or ur < l) return;
+  if (ul <= l and r <= ur) {
+    tree[node].push_back(idx);
+    return;
+  }
+  int m = l + r >> 1;
+  update(idx, l, m, node << 1);
+  update(idx, m + 1, r, node << 1 | 1);
+}
+void dfs(int l = 0, int r = que ::tm, int node = 1) {
+  int cur = edge_set ::time();
+  for (int e : tree[node]) edge_set ::push(e);
+  if (l == r) {
+    que ::ans[l] = edge_set ::query(que ::node[l]);
+  } else {
+    int m = l + r >> 1;
+    dfs(l, m, node << 1);
+    dfs(m + 1, r, node << 1 | 1);
+  }
+  edge_set ::pop(cur);
+}
+}  // namespace dncq
+void push_updates() {
+  for (int i = 0; i < up ::tm; i++) dncq ::update(i);
+}
+\end{lstlisting}
+\subsection{Merge Sort Tree}
+\begin{lstlisting}
+vector<LL> Tree[4 * MAXN];
+LL arr[MAXN];
+
+vector<LL> merge(vector<LL> v1, vector<LL> v2) {
+  LL i = 0, j = 0;
+  vector<LL> ret;
+
+  while (i < v1.size() || j < v2.size()) {
+    if (i == v1.size()) {
+      ret.push_back(v2[j]);
+      j++;
+    } else if (j == v2.size()) {
+      ret.push_back(v1[i]);
+      i++;
+    } else {
+      if (v1[i] < v2[j]) {
+        ret.push_back(v1[i]);
+        i++;
+      } else {
+        ret.push_back(v2[j]);
+        j++;
+      }
+    }
+  }
+
+  return ret;
+}
+
+void Build(LL node, LL bg, LL ed) {
+  if (bg == ed) {
+    Tree[node].push_back(arr[bg]);
+    return;
+  }
+
+  LL leftNode = 2 * node, rightNode = 2 * node + 1;
+  LL mid = (bg + ed) / 2;
+
+  Build(leftNode, bg, mid);
+  Build(rightNode, mid + 1, ed);
+
+  Tree[node] = merge(Tree[leftNode], Tree[rightNode]);
+}
+
+LL query(LL node, LL bg, LL ed, LL l, LL r, LL k) {
+  if (ed < l || bg > r) return 0;
+
+  if (l <= bg && ed <= r)
+    return upper_bound(Tree[node].begin(), Tree[node].end(), k) -
+           Tree[node].begin();
+
+  LL leftNode = 2 * node, rightNode = 2 * node + 1;
+  LL mid = (bg + ed) / 2;
+
+  return query(leftNode, bg, mid, l, r, k) +
+         query(rightNode, mid + 1, ed, l, r, k);
+}
+\end{lstlisting}
+\subsection{MO with Update}
+\begin{lstlisting}
+const int N = 1e5 + 5, sz = 2700, bs = 25;
+int arr[N], freq[2 * N], cnt[2 * N], id[N], ans[N];
+struct query {
+  int l, r, t, L, R;
+  query(int l = 1, int r = 0, int t = 1, int id = -1)
+      : l(l), r(r), t(t), L(l / sz), R(r / sz) {}
+  bool operator<(const query &rhs) const {
+    return (L < rhs.L) or (L == rhs.L and R < rhs.R) or
+           (L == rhs.L and R == rhs.R and t < rhs.t);
+  }
+} Q[N];
+struct update {
+  int idx, val, last;
+} Up[N];
+int qi = 0, ui = 0;
+int l = 1, r = 0, t = 0;
+
+void add(int idx) {
+  --cnt[freq[arr[idx]]];
+  freq[arr[idx]]++;
+  cnt[freq[arr[idx]]]++;
+}
+void remove(int idx) {
+  --cnt[freq[arr[idx]]];
+  freq[arr[idx]]--;
+  cnt[freq[arr[idx]]]++;
+}
+void apply(int t) {
+  const bool f = l <= Up[t].idx and Up[t].idx <= r;
+  if (f) remove(Up[t].idx);
+  arr[Up[t].idx] = Up[t].val;
+  if (f) add(Up[t].idx);
+}
+void undo(int t) {
+  const bool f = l <= Up[t].idx and Up[t].idx <= r;
+  if (f) remove(Up[t].idx);
+  arr[Up[t].idx] = Up[t].last;
+  if (f) add(Up[t].idx);
+}
+int mex() {
+  for (int i = 1; i <= N; i++)
+    if (!cnt[i]) return i;
+  assert(0);
+}
+int main() {
+  int n, q;
+  cin >> n >> q;
+  int counter = 0;
+  map<int, int> M;
+  for (int i = 1; i <= n; i++) {
+    cin >> arr[i];
+    if (!M[arr[i]]) M[arr[i]] = ++counter;
+    arr[i] = M[arr[i]];
+  }
+  iota(id, id + N, 0);
+  while (q--) {
+    int tp, x, y;
+    cin >> tp >> x >> y;
+    if (tp == 1)
+      Q[++qi] = query(x, y, ui);
+    else {
+      if (!M[y]) M[y] = ++counter;
+      y = M[y];
+      Up[++ui] = {x, y, arr[x]};
+      arr[x] = y;
+    }
+  }
+  t = ui;
+  cnt[0] = 3 * n;
+  sort(id + 1, id + qi + 1, [&](int x, int y) { return Q[x] < Q[y]; });
+  for (int i = 1; i <= qi; i++) {
+    int x = id[i];
+    while (Q[x].t > t) apply(++t);
+    while (Q[x].t < t) undo(t--);
+    while (Q[x].l < l) add(--l);
+    while (Q[x].r > r) add(++r);
+    while (Q[x].l > l) remove(l++);
+    while (Q[x].r < r) remove(r--);
+    ans[x] = mex();
+  }
+  for (int i = 1; i <= qi; i++) cout << ans[i] << '\n';
+}
+\end{lstlisting}
+\subsection{SparseTable (Rectangle Query)}
+\begin{lstlisting}
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAXN = 505;
+const int LOGN = 9;
+
+// O(n^2 (logn)^2
+// Supports Rectangular Query
+int A[MAXN][MAXN];
+int M[MAXN][MAXN][LOGN][LOGN];
+
+void Build2DSparse(int N) {
+  for (int i = 1; i <= N; i++) {
+    for (int j = 1; j <= N; j++) {
+      M[i][j][0][0] = A[i][j];
+    }
+    for (int q = 1; (1 << q) <= N; q++) {
+      int add = 1 << (q - 1);
+      for (int j = 1; j + add <= N; j++) {
+        M[i][j][0][q] = max(M[i][j][0][q - 1], M[i][j + add][0][q - 1]);
+      }
+    }
+  }
+
+  for (int p = 1; (1 << p) <= N; p++) {
+    int add = 1 << (p - 1);
+    for (int i = 1; i + add <= N; i++) {
+      for (int q = 0; (1 << q) <= N; q++) {
+        for (int j = 1; j <= N; j++) {
+          M[i][j][p][q] = max(M[i][j][p - 1][q], M[i + add][j][p - 1][q]);
+        }
+      }
+    }
+  }
+}
+
+// returns max of all A[i][j], where x1<=i<=x2 and y1<=j<=y2
+int Query(int x1, int y1, int x2, int y2) {
+  int kX = log2(x2 - x1 + 1);
+  int kY = log2(y2 - y1 + 1);
+  int addX = 1 << kX;
+  int addY = 1 << kY;
+
+  int ret1 = max(M[x1][y1][kX][kY], M[x1][y2 - addY + 1][kX][kY]);
+  int ret2 = max(M[x2 - addX + 1][y1][kX][kY],
+                 M[x2 - addX + 1][y2 - addY + 1][kX][kY]);
+  return max(ret1, ret2);
 }
 \end{lstlisting}
 \section{Geometry}
@@ -2170,223 +2170,6 @@ int dfs(int u, int p) {
 }
 \end{lstlisting}
 \section{Math}
-\subsection{Adaptive Simpsons}
-\begin{lstlisting}
-/*
-    For finding the length of an arc in a range
-    L = integrate(ds) from start to end of range
-    where ds = sqrt(1+(d/dy(x))^2)dy
-*/
-const double SIMPSON_TERMINAL_EPS = 1e-12;
-/// Function whose integration is to be calculated
-double F(double x);
-double simpson(double minx, double maxx) {
-  return (maxx - minx) / 6 * (F(minx) + 4 * F((minx + maxx) / 2.) + F(maxx));
-}
-double adaptive_simpson(double minx, double maxx, double c, double EPS) {
-  //    if(maxx - minx < SIMPSON_TERMINAL_EPS) return 0;
-
-  double midx = (minx + maxx) / 2;
-  double a = simpson(minx, midx);
-  double b = simpson(midx, maxx);
-
-  if (fabs(a + b - c) < 15 * EPS) return a + b + (a + b - c) / 15.0;
-
-  return adaptive_simpson(minx, midx, a, EPS / 2.) +
-         adaptive_simpson(midx, maxx, b, EPS / 2.);
-}
-double adaptive_simpson(double minx, double maxx, double EPS) {
-  return adaptive_simpson(minx, maxx, simpson(minx, maxx, i), EPS);
-}
-
-\end{lstlisting}
-\subsection{Berlekamp Massey}
-\begin{lstlisting}
-struct berlekamp_massey { // for linear recursion
-  typedef long long LL;
-  static const int SZ = 2e5 + 5;
-  static const int MOD = 1e9 + 7; /// mod must be a prime
-  LL m , a[SZ] , h[SZ] , t_[SZ] , s[SZ] , t[SZ];
-  // bigmod goes here
-  inline vector <LL> BM( vector <LL> &x ) {
-    LL lf , ld;
-    vector <LL> ls , cur;
-    for ( int i = 0; i < int(x.size()); ++i ) {
-      LL t = 0;
-      for ( int j = 0; j < int(cur.size()); ++j ) t = (t + x[i - j - 1] * cur[j]) % MOD;
-      if ( (t - x[i]) % MOD == 0 ) continue;
-      if ( !cur.size() ) {
-        cur.resize( i + 1 );
-        lf = i; ld = (t - x[i]) % MOD;
-        continue;
-      }
-      LL k = -(x[i] - t) * bigmod( ld , MOD - 2 , MOD ) % MOD;
-      vector <LL> c(i - lf - 1);
-      c.push_back( k );
-      for ( int j = 0; j < int(ls.size()); ++j ) c.push_back(-ls[j] * k % MOD);
-      if ( c.size() < cur.size() ) c.resize( cur.size() );
-      for ( int j = 0; j < int(cur.size()); ++j ) c[j] = (c[j] + cur[j]) % MOD;
-      if (i - lf + (int)ls.size() >= (int)cur.size() ) ls = cur, lf = i, ld = (t - x[i]) % MOD;
-      cur = c;
-    }
-    for ( int i = 0; i < int(cur.size()); ++i ) cur[i] = (cur[i] % MOD + MOD) % MOD;
-    return cur;
-  }
-  inline void mull( LL *p , LL *q ) {
-    for ( int i = 0; i < m + m; ++i ) t_[i] = 0;
-    for ( int i = 0; i < m; ++i ) if ( p[i] )
-        for ( int j = 0; j < m; ++j ) t_[i + j] = (t_[i + j] + p[i] * q[j]) % MOD;
-    for ( int i = m + m - 1; i >= m; --i ) if ( t_[i] )
-        for ( int j = m - 1; ~j; --j ) t_[i - j - 1] = (t_[i - j - 1] + t_[i] * h[j]) % MOD;
-    for ( int i = 0; i < m; ++i ) p[i] = t_[i];
-  }
-  inline LL calc( LL K ) {
-    for ( int i = m; ~i; --i ) s[i] = t[i] = 0;
-    s[0] = 1; if ( m != 1 ) t[1] = 1; else t[0] = h[0];
-    while ( K ) {
-      if ( K & 1 ) mull( s , t );
-      mull( t , t ); K >>= 1;
-    }
-    LL su = 0;
-    for ( int i = 0; i < m; ++i ) su = (su + s[i] * a[i]) % MOD;
-    return (su % MOD + MOD) % MOD;
-  }
-  /// already calculated upto k , now calculate upto n.
-  inline vector <LL> process( vector <LL> &x , int n , int k ) {
-    auto re = BM( x );
-    x.resize( n + 1 );
-    for ( int i = k + 1; i <= n; i++ ) {
-      for ( int j = 0; j < re.size(); j++ ) {
-        x[i] += 1LL * x[i - j - 1] % MOD * re[j] % MOD; x[i] %= MOD;
-      }
-    }
-    return x;
-  }
-  inline LL work( vector <LL> &x , LL n ) {
-    if ( n < int(x.size()) ) return x[n] % MOD;
-    vector <LL> v = BM( x ); m = v.size(); if ( !m ) return 0;
-    for ( int i = 0; i < m; ++i ) h[i] = v[i], a[i] = x[i];
-    return calc( n ) % MOD;
-  }
-} rec;
-vector <LL> v;
-void solve() {
-  int n;
-  cin >> n;
-  cout << rec.work(v, n - 1) << endl;
-}
-
-\end{lstlisting}
-\subsection{Fractional Binary Search}
-\begin{lstlisting}
-/**
-Given a function f and n, finds the smallest fraction p / q in [0, 1] or [0,n]
-such that f(p / q) is true, and p, q <= n.
-Time: O(log(n))
-**/
-struct frac { long long p, q; };
-bool f(frac x) {
- return 6 + 8 * x.p >= 17 * x.q + 12;
-}
-frac fracBS(long long n) {
-  bool dir = 1, A = 1, B = 1;
-  frac lo{0, 1}, hi{1, 0}; // Set hi to 1/0 to search within [0, n] and {1, 1} to search within [0, 1]
-  if (f(lo)) return lo;
-  assert(f(hi)); //checking if any solution exists or not
-  while (A || B) {
-    long long adv = 0, step = 1; // move hi if dir, else lo
-    for (int si = 0; step; (step *= 2) >>= si) {
-      adv += step;
-      frac mid{lo.p * adv + hi.p, lo.q * adv + hi.q};
-      if (abs(mid.p) > n || mid.q > n || dir == !f(mid)) {
-        adv -= step; si = 2;
-      } 
-    }
-    hi.p += lo.p * adv;
-    hi.q += lo.q * adv;
-    dir = !dir;
-    swap(lo, hi);
-    A = B; B = !!adv;
-  }
-  return dir ? hi : lo;
-}
-\end{lstlisting}
-\subsection{Lagrange}
-\begin{lstlisting}
-// p is a polynomial with n points.
-// p(0), p(1), p(2), ... p(n-1) are given.
-// Find p(x).
-LL Lagrange(vector<LL> &p, LL x) {
-  LL n = p.size(), L, i, ret;
-  if (x < n) return p[x];
-  L = 1;
-  for (i = 1; i < n; i++) {
-    L = (L * (x - i)) % MOD;
-    L = (L * bigmod(MOD - i, MOD - 2)) % MOD;
-  }
-  ret = (L * p[0]) % MOD;
-  for (i = 1; i < n; i++) {
-    L = (L * (x - i + 1)) % MOD;
-    L = (L * bigmod(x - i, MOD - 2)) % MOD;
-    L = (L * bigmod(i, MOD - 2)) % MOD;
-    L = (L * (MOD + i - n)) % MOD;
-    ret = (ret + L * p[i]) % MOD;
-  }
-  return ret;
-}
-\end{lstlisting}
-\subsection{Shanks' Baby Step, Giant Step}
-\begin{lstlisting}
-// Finds a^x = b (mod p)
-
-LL bigmod(LL b, LL p, LL m) {}
-
-LL babyStepGiantStep(LL a, LL b, LL p) {
-  LL i, j, c, sq = sqrt(p);
-  map<LL, LL> babyTable;
-
-  for (j = 0, c = 1; j <= sq; j++, c = (c * a) % p) babyTable[c] = j;
-
-  LL giant = bigmod(a, sq * (p - 2), p);
-
-  for (i = 0, c = 1; i <= sq; i++, c = (c * giant) % p) {
-    if (babyTable.find((c * b) % p) != babyTable.end())
-      return i * sq + babyTable[(c * b) % p];
-  }
-
-  return -1;
-}
-\end{lstlisting}
-\subsection{Xor Basis}
-\begin{lstlisting}
-struct XorBasis {
-  static const int sz = 64;
-  array<ULL, sz> base = {0}, back;
-  array<int, sz> pos;
-  void insert(ULL x, int p) {
-    ULL cur = 0;
-    for (int i = sz - 1; ~i; i--)
-      if (x >> i & 1) {
-        if (!base[i]) {
-          base[i] = x, back[i] = cur, pos[i] = p;
-          break;
-        } else x ^= base[i], cur |= 1ULL << i;
-      }
-  }
-  pair<ULL, vector<int>> construct(ULL mask) {
-    ULL ok = 0, x = mask;
-    for (int i = sz - 1; ~i; i--)
-      if (mask >> i & 1 and base[i]) mask ^= base[i], ok |= 1ULL << i;
-    vector<int> ans;
-    for (int i = 0; i < sz; i++)
-      if (ok >> i & 1) {
-        ans.push_back(pos[i]);
-        ok ^= back[i];
-      }
-    return {x ^ mask, ans};
-  }
-};
-\end{lstlisting}
 \subsection{Combi}
 \begin{lstlisting}
 array<int, N + 1> fact, inv, inv_fact;
@@ -2786,6 +2569,223 @@ void FWHT(vector<LL>& p, bool inverse) {
   }
 #endif  // bitwiseXOR
 }
+\end{lstlisting}
+\subsection{Adaptive Simpsons}
+\begin{lstlisting}
+/*
+    For finding the length of an arc in a range
+    L = integrate(ds) from start to end of range
+    where ds = sqrt(1+(d/dy(x))^2)dy
+*/
+const double SIMPSON_TERMINAL_EPS = 1e-12;
+/// Function whose integration is to be calculated
+double F(double x);
+double simpson(double minx, double maxx) {
+  return (maxx - minx) / 6 * (F(minx) + 4 * F((minx + maxx) / 2.) + F(maxx));
+}
+double adaptive_simpson(double minx, double maxx, double c, double EPS) {
+  //    if(maxx - minx < SIMPSON_TERMINAL_EPS) return 0;
+
+  double midx = (minx + maxx) / 2;
+  double a = simpson(minx, midx);
+  double b = simpson(midx, maxx);
+
+  if (fabs(a + b - c) < 15 * EPS) return a + b + (a + b - c) / 15.0;
+
+  return adaptive_simpson(minx, midx, a, EPS / 2.) +
+         adaptive_simpson(midx, maxx, b, EPS / 2.);
+}
+double adaptive_simpson(double minx, double maxx, double EPS) {
+  return adaptive_simpson(minx, maxx, simpson(minx, maxx, i), EPS);
+}
+
+\end{lstlisting}
+\subsection{Berlekamp Massey}
+\begin{lstlisting}
+struct berlekamp_massey { // for linear recursion
+  typedef long long LL;
+  static const int SZ = 2e5 + 5;
+  static const int MOD = 1e9 + 7; /// mod must be a prime
+  LL m , a[SZ] , h[SZ] , t_[SZ] , s[SZ] , t[SZ];
+  // bigmod goes here
+  inline vector <LL> BM( vector <LL> &x ) {
+    LL lf , ld;
+    vector <LL> ls , cur;
+    for ( int i = 0; i < int(x.size()); ++i ) {
+      LL t = 0;
+      for ( int j = 0; j < int(cur.size()); ++j ) t = (t + x[i - j - 1] * cur[j]) % MOD;
+      if ( (t - x[i]) % MOD == 0 ) continue;
+      if ( !cur.size() ) {
+        cur.resize( i + 1 );
+        lf = i; ld = (t - x[i]) % MOD;
+        continue;
+      }
+      LL k = -(x[i] - t) * bigmod( ld , MOD - 2 , MOD ) % MOD;
+      vector <LL> c(i - lf - 1);
+      c.push_back( k );
+      for ( int j = 0; j < int(ls.size()); ++j ) c.push_back(-ls[j] * k % MOD);
+      if ( c.size() < cur.size() ) c.resize( cur.size() );
+      for ( int j = 0; j < int(cur.size()); ++j ) c[j] = (c[j] + cur[j]) % MOD;
+      if (i - lf + (int)ls.size() >= (int)cur.size() ) ls = cur, lf = i, ld = (t - x[i]) % MOD;
+      cur = c;
+    }
+    for ( int i = 0; i < int(cur.size()); ++i ) cur[i] = (cur[i] % MOD + MOD) % MOD;
+    return cur;
+  }
+  inline void mull( LL *p , LL *q ) {
+    for ( int i = 0; i < m + m; ++i ) t_[i] = 0;
+    for ( int i = 0; i < m; ++i ) if ( p[i] )
+        for ( int j = 0; j < m; ++j ) t_[i + j] = (t_[i + j] + p[i] * q[j]) % MOD;
+    for ( int i = m + m - 1; i >= m; --i ) if ( t_[i] )
+        for ( int j = m - 1; ~j; --j ) t_[i - j - 1] = (t_[i - j - 1] + t_[i] * h[j]) % MOD;
+    for ( int i = 0; i < m; ++i ) p[i] = t_[i];
+  }
+  inline LL calc( LL K ) {
+    for ( int i = m; ~i; --i ) s[i] = t[i] = 0;
+    s[0] = 1; if ( m != 1 ) t[1] = 1; else t[0] = h[0];
+    while ( K ) {
+      if ( K & 1 ) mull( s , t );
+      mull( t , t ); K >>= 1;
+    }
+    LL su = 0;
+    for ( int i = 0; i < m; ++i ) su = (su + s[i] * a[i]) % MOD;
+    return (su % MOD + MOD) % MOD;
+  }
+  /// already calculated upto k , now calculate upto n.
+  inline vector <LL> process( vector <LL> &x , int n , int k ) {
+    auto re = BM( x );
+    x.resize( n + 1 );
+    for ( int i = k + 1; i <= n; i++ ) {
+      for ( int j = 0; j < re.size(); j++ ) {
+        x[i] += 1LL * x[i - j - 1] % MOD * re[j] % MOD; x[i] %= MOD;
+      }
+    }
+    return x;
+  }
+  inline LL work( vector <LL> &x , LL n ) {
+    if ( n < int(x.size()) ) return x[n] % MOD;
+    vector <LL> v = BM( x ); m = v.size(); if ( !m ) return 0;
+    for ( int i = 0; i < m; ++i ) h[i] = v[i], a[i] = x[i];
+    return calc( n ) % MOD;
+  }
+} rec;
+vector <LL> v;
+void solve() {
+  int n;
+  cin >> n;
+  cout << rec.work(v, n - 1) << endl;
+}
+
+\end{lstlisting}
+\subsection{Fractional Binary Search}
+\begin{lstlisting}
+/**
+Given a function f and n, finds the smallest fraction p / q in [0, 1] or [0,n]
+such that f(p / q) is true, and p, q <= n.
+Time: O(log(n))
+**/
+struct frac { long long p, q; };
+bool f(frac x) {
+ return 6 + 8 * x.p >= 17 * x.q + 12;
+}
+frac fracBS(long long n) {
+  bool dir = 1, A = 1, B = 1;
+  frac lo{0, 1}, hi{1, 0}; // Set hi to 1/0 to search within [0, n] and {1, 1} to search within [0, 1]
+  if (f(lo)) return lo;
+  assert(f(hi)); //checking if any solution exists or not
+  while (A || B) {
+    long long adv = 0, step = 1; // move hi if dir, else lo
+    for (int si = 0; step; (step *= 2) >>= si) {
+      adv += step;
+      frac mid{lo.p * adv + hi.p, lo.q * adv + hi.q};
+      if (abs(mid.p) > n || mid.q > n || dir == !f(mid)) {
+        adv -= step; si = 2;
+      } 
+    }
+    hi.p += lo.p * adv;
+    hi.q += lo.q * adv;
+    dir = !dir;
+    swap(lo, hi);
+    A = B; B = !!adv;
+  }
+  return dir ? hi : lo;
+}
+\end{lstlisting}
+\subsection{Lagrange}
+\begin{lstlisting}
+// p is a polynomial with n points.
+// p(0), p(1), p(2), ... p(n-1) are given.
+// Find p(x).
+LL Lagrange(vector<LL> &p, LL x) {
+  LL n = p.size(), L, i, ret;
+  if (x < n) return p[x];
+  L = 1;
+  for (i = 1; i < n; i++) {
+    L = (L * (x - i)) % MOD;
+    L = (L * bigmod(MOD - i, MOD - 2)) % MOD;
+  }
+  ret = (L * p[0]) % MOD;
+  for (i = 1; i < n; i++) {
+    L = (L * (x - i + 1)) % MOD;
+    L = (L * bigmod(x - i, MOD - 2)) % MOD;
+    L = (L * bigmod(i, MOD - 2)) % MOD;
+    L = (L * (MOD + i - n)) % MOD;
+    ret = (ret + L * p[i]) % MOD;
+  }
+  return ret;
+}
+\end{lstlisting}
+\subsection{Shanks' Baby Step, Giant Step}
+\begin{lstlisting}
+// Finds a^x = b (mod p)
+
+LL bigmod(LL b, LL p, LL m) {}
+
+LL babyStepGiantStep(LL a, LL b, LL p) {
+  LL i, j, c, sq = sqrt(p);
+  map<LL, LL> babyTable;
+
+  for (j = 0, c = 1; j <= sq; j++, c = (c * a) % p) babyTable[c] = j;
+
+  LL giant = bigmod(a, sq * (p - 2), p);
+
+  for (i = 0, c = 1; i <= sq; i++, c = (c * giant) % p) {
+    if (babyTable.find((c * b) % p) != babyTable.end())
+      return i * sq + babyTable[(c * b) % p];
+  }
+
+  return -1;
+}
+\end{lstlisting}
+\subsection{Xor Basis}
+\begin{lstlisting}
+struct XorBasis {
+  static const int sz = 64;
+  array<ULL, sz> base = {0}, back;
+  array<int, sz> pos;
+  void insert(ULL x, int p) {
+    ULL cur = 0;
+    for (int i = sz - 1; ~i; i--)
+      if (x >> i & 1) {
+        if (!base[i]) {
+          base[i] = x, back[i] = cur, pos[i] = p;
+          break;
+        } else x ^= base[i], cur |= 1ULL << i;
+      }
+  }
+  pair<ULL, vector<int>> construct(ULL mask) {
+    ULL ok = 0, x = mask;
+    for (int i = sz - 1; ~i; i--)
+      if (mask >> i & 1 and base[i]) mask ^= base[i], ok |= 1ULL << i;
+    vector<int> ans;
+    for (int i = 0; i < sz; i++)
+      if (ok >> i & 1) {
+        ans.push_back(pos[i]);
+        ok ^= back[i];
+      }
+    return {x ^ mask, ans};
+  }
+};
 \end{lstlisting}
 \section{String}
 \subsection{Aho Corasick}

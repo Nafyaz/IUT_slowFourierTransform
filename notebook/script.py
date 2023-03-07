@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 Base = './Codes/'
 def ProcessFile(f, name, W):

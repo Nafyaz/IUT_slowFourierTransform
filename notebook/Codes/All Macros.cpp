@@ -13,7 +13,7 @@ template <typename DT>
 using ordered_set = tree <DT, null_type, less<DT>, rb_tree_tag,tree_order_statistics_node_update>;
 
 /*--- DEBUG TEMPLATE STARTS HERE ---*/
-#ifdef LEL
+#ifdef SFT
 void show(int x) {cerr << x;}
 void show(long long x) {cerr << x;}
 void show(double x) {cerr << x;}
