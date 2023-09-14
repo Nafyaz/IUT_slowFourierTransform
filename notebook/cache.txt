@@ -1,5 +1,5 @@
-IUT slowFourierTransform
-Islamic University of Technology
+IUT Brogrammers
+IUT
 3
 landscape
-10
+12

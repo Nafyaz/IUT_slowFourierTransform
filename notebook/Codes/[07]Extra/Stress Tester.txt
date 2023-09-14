@@ -1,0 +1,18 @@
+make $1
+make $2
+make $3
+
+# $1 is actual code
+# $2 is good code
+# $3 is generator
+for((i=1;i<1001;i++)); do
+  echo 'Test #'$i
+
+  timeout 5s ./$3 $RANDOM > in
+  timeout 5s ./$1 < in> out
+  timeout 5s ./$2 < in> ans
+
+  diff out ans|| break
+done
+
+

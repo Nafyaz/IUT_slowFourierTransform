@@ -1,0 +1,91 @@
+" Auto import & Compile
+:autocmd BufNewFile *.cpp 0r ~/template.cpp
+
+nnoremap <F4> :!xclip -o -sel clip > ~/cp/in <CR><CR>
+inoremap <F4> <ESC>:!xclip -o -sel clip > ~/cp/in <CR><CR>
+nnoremap <F6> :!xclip -sel clip % <CR><CR>
+inoremap <F6> <ESC>:!xclip -sel clip % <CR><CR>
+
+autocmd filetype cpp nnoremap <F9>       :wa \| !make %:r && timeout 5s ./%:r < ~/cp/in> ~/cp/out<CR>
+autocmd filetype cpp inoremap <F9>  <ESC>:wa \| !make %:r && timeout 5s  ./%:r < ~/cp/in> ~/cp/out<CR>
+autocmd filetype cpp nnoremap <F10>      :wa \| !make clean && make %:r D=1 && ./%:r < ~/cp/in> ~/cp/out<CR>
+autocmd filetype cpp inoremap <F10> <ESC>:wa \| !make clean && make %:r D=1 && ./%:r < ~/cp/in > ~/cp/out<CR>
+
+autocmd filetype python nnoremap <F9> :wa \| !python % < ~/cp/in> ~/cp/out<CR>
+autocmd filetype python inoremap <F9> <ESC>:wa \| !python % < ~/cp/in> ~/cp/out<CR>
+
+" Auto Completion
+inoremap ( ()<left>
+inoremap <expr> ) strpart(getline('.'), col('.')-1, 1) == ")" ? "\<Right>" : ")"
+inoremap { {}<left>
+inoremap <expr> } strpart(getline('.'), col('.')-1, 1) == "}" ? "\<Right>" : "}"
+inoremap [ []<left>
+inoremap <expr> ] strpart(getline('.'), col('.')-1, 1) == "]" ? "\<Right>" : "]"
+inoremap <expr> " strpart(getline('.'), col('.')-1, 1) == "\"" ? "\<Right>" : "\"\"\<left>"
+inoremap <expr> ' strpart(getline('.'), col('.')-1, 1) == "\'" ? "\<Right>" : "\'\'\<left>"
+
+inoremap <expr> <CR> <sid>insert_newline()
+function s:insert_newline() abort
+  let pair = strpart(getline('.'), col('.')-2, 2)
+  return stridx('{}[]', pair) % 2 == 0 && strlen(pair) == 2 ? "\<CR>\<ESC>\O" : "\<CR>"
+endfunction
+
+inoremap <expr> <space> <sid>insert_space()
+function s:insert_space() abort
+  let pair = strpart(getline('.'), col('.')-2, 2)
+  return stridx('(){}[]', pair) % 2 == 0 && strlen(pair) == 2 ? "\<space>\<space>\<left>" : "\<space>"
+endfunction
+
+inoremap <expr> <bs> <sid>rm_pair()
+function s:rm_pair() abort
+	let pair = strpart(getline('.'), col('.')-2, 2)
+	return stridx('(){}[]''''""', pair) % 2 == 0 && strlen(pair) == 2 ? "\<del>\<bs>" : "\<bs>"
+endfunction
+
+set nocompatible              " be iMproved, required
+filetype on                  " required
+filetype plugin on
+filetype plugin indent on
+syntax on
+
+set mouse=a
+set number
+set relativenumber
+set tabstop=2
+set shiftwidth=2
+set expandtab
+set softtabstop=2
+set smartindent
+set smarttab
+set autoindent
+set cindent
+set noerrorbells
+set ruler
+set guifont=*
+set backspace=indent,eol,start
+set ignorecase
+set incsearch
+set nowrap
+set hlsearch
+
+" bubt site
+" set termguicolors
+set foldmethod=indent
+set nofoldenable
+set cursorline
+set laststatus=2
+set showcmd
+set wildmenu
+
+
+if !has('nvim')
+  set clipboard=unnamedplus
+endif
+if !has('nvim')
+  set ttymouse=xterm2
+endif
+
+nnoremap <S-j> :m .+1<CR>==
+nnoremap <S-k> :m .-2<CR>==
+vnoremap <S-j> :m '>+1<CR>gv==gv
+vnoremap <S-k> :m '<-2<CR>gv==gv
